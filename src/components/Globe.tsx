@@ -274,7 +274,15 @@ const SceneController: React.FC = () => {
 
 export const Globe: React.FC = () => {
   return (
-    <div className="w-full h-full cursor-grab active:cursor-grabbing relative bg-radial-gradient">
+    <div
+      className="bg-radial-gradient"
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        cursor: 'grab'
+      }}
+    >
       <Canvas
         camera={{ position: [0, 0, 6.5], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
@@ -285,9 +293,31 @@ export const Globe: React.FC = () => {
       </Canvas>
       
       {/* Decorative compass lines in the background */}
-      <div className="absolute inset-0 pointer-events-none border border-white/5 m-12 rounded-full opacity-10 flex items-center justify-center">
-        <div className="w-4/5 h-4/5 border border-dashed border-white/10 rounded-full flex items-center justify-center">
-          <div className="w-3/5 h-3/5 border border-white/5 rounded-full"></div>
+      <div
+        className="pointer-events-none"
+        style={{
+          position: 'absolute',
+          inset: '48px',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          borderRadius: '50%',
+          opacity: 0.1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <div
+          style={{
+            width: '80%',
+            height: '80%',
+            border: '1px dashed rgba(255, 255, 255, 0.1)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <div style={{ width: '60%', height: '60%', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '50%' }}></div>
         </div>
       </div>
     </div>

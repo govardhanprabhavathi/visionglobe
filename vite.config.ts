@@ -7,4 +7,22 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  build: {
+    chunkSizeWarningLimit: 1600, // Increase warning threshold for WebGL assets
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('three') || id.includes('@react-three')) {
+              return 'three-vendor';
+            }
+            if (id.includes('react')) {
+              return 'react-vendor';
+            }
+            return 'vendor';
+          }
+        }
+      }
+    }
+  }
 })

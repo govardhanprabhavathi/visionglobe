@@ -284,33 +284,33 @@ export const HandTracker: React.FC = () => {
   };
 
   return (
-    <div className="glass-panel dashboard-panel hud-border p-4 flex flex-col gap-4 relative overflow-hidden" style={{ minHeight: '260px' }}>
-      <div className="flex items-center justify-between border-b border-white/10 pb-2">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-sky-400" />
-          <h2 className="text-cyber title-glow font-bold text-sm tracking-wider">Vision Engine</h2>
+    <div className="glass-panel dashboard-panel hud-border" style={{ minHeight: '260px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative', overflow: 'hidden' }}>
+      <div className="panel-header">
+        <div className="panel-title">
+          <Sparkles className="w-5 h-5 text-primary-accent" style={{ color: 'var(--primary)' }} />
+          <span>Vision Engine</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className={`pulse-dot ${isTracking ? 'bg-emerald' : 'bg-zinc-500'}`} style={{ backgroundColor: isTracking ? 'var(--emerald)' : 'var(--text-muted)' }}></div>
-          <span className="text-[10px] text-cyber text-text-secondary">
+        <div className="indicator-item">
+          <div className="pulse-dot" style={{ backgroundColor: isTracking ? 'var(--emerald)' : 'var(--text-muted)' }}></div>
+          <span className="text-cyber text-text-secondary" style={{ fontSize: '10px', color: isTracking ? 'var(--emerald)' : 'var(--text-secondary)' }}>
             {isTracking ? 'TRACKING ACTIVE' : 'OFFLINE'}
           </span>
         </div>
       </div>
 
       {/* Video / Camera viewport */}
-      <div className="relative aspect-video rounded-lg overflow-hidden bg-black/40 border border-white/5 flex items-center justify-center">
+      <div className="camera-feed-viewport">
         {!isTracking && (
-          <div className="flex flex-col items-center gap-2 text-zinc-500 text-center p-4">
-            <CameraOff className="w-8 h-8 opacity-40 mb-1" />
-            <p className="text-xs font-semibold">Webcam Feed Inactive</p>
-            <p className="text-[10px] max-w-[200px] text-text-muted">Activate tracking to control the 3D globe with hand gestures</p>
+          <div className="camera-feed-placeholder">
+            <CameraOff className="empty-state-icon" style={{ marginBottom: '4px', width: '32px', height: '32px', opacity: 0.4 }} />
+            <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>Webcam Feed Inactive</p>
+            <p className="text-muted" style={{ fontSize: '10px', maxWidth: '200px', color: 'var(--text-secondary)', opacity: 0.6 }}>Activate tracking to control the 3D globe with hand gestures</p>
           </div>
         )}
 
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover scale-x-[-1] pointer-events-none"
+          className="camera-feed-video"
           playsInline
           muted
           style={{ display: isTracking ? 'block' : 'none' }}
@@ -318,39 +318,39 @@ export const HandTracker: React.FC = () => {
         
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none"
+          className="camera-feed-canvas"
           style={{ display: isTracking ? 'block' : 'none' }}
         />
 
         {trackingStatus === 'loading' && (
-          <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center gap-2">
-            <Loader className="w-8 h-8 text-sky-400 animate-spin" />
-            <p className="text-xs text-cyber text-sky-400">Loading Vision Models...</p>
+          <div className="camera-feed-loading">
+            <Loader className="spinner" style={{ color: 'var(--primary)' }} />
+            <p className="text-cyber text-primary-accent" style={{ fontSize: '10px' }}>Loading Vision Models...</p>
           </div>
         )}
       </div>
 
       {trackingError && (
-        <div className="text-[11px] text-red-400 bg-red-950/30 border border-red-500/20 rounded p-2 text-center">
+        <div className="metric-detail-box" style={{ color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.2)', textAlign: 'center', fontSize: '10px' }}>
           {trackingError}
         </div>
       )}
 
       {/* Controller Buttons */}
-      <div className="flex gap-2">
+      <div className="flex-row-gap">
         <button
           onClick={toggleCamera}
           disabled={trackingStatus === 'loading'}
-          className={`glass-button flex-1 justify-center ${isTracking ? 'active' : ''}`}
+          className={`glass-button flex-1 ${isTracking ? 'active' : ''}`}
         >
           {isTracking ? (
             <>
-              <CameraOff className="w-4 h-4" />
+              <CameraOff style={{ width: '16px', height: '16px' }} />
               <span>Disable Tracking</span>
             </>
           ) : (
             <>
-              <Camera className="w-4 h-4" />
+              <Camera style={{ width: '16px', height: '16px' }} />
               <span>Enable Gestures</span>
             </>
           )}
@@ -359,14 +359,14 @@ export const HandTracker: React.FC = () => {
 
       {/* Guide details */}
       {isTracking && (
-        <div className="bg-white/5 border border-white/5 rounded p-2 text-[10px] text-text-secondary flex flex-col gap-1">
-          <div className="flex justify-between">
+        <div className="camera-feed-guide">
+          <div className="control-row" style={{ fontSize: '10px' }}>
             <span>Open Palm:</span>
-            <span className="text-sky-400 font-semibold">Hover & Drag to Rotate</span>
+            <span className="text-primary-accent font-semibold" style={{ color: 'var(--primary)' }}>Hover & Drag to Rotate</span>
           </div>
-          <div className="flex justify-between">
+          <div className="control-row" style={{ fontSize: '10px' }}>
             <span>Closed Fist:</span>
-            <span className="text-pink-400 font-semibold">Move Up/Down to Zoom</span>
+            <span className="text-pink-accent font-semibold" style={{ color: 'var(--accent)' }}>Move Up/Down to Zoom</span>
           </div>
         </div>
       )}
