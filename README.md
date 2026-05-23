@@ -1,73 +1,48 @@
-# React + TypeScript + Vite
+# VisionGlobe 🌍✋
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+VisionGlobe is an interactive, browser-based Augmented Reality (AR) application that allows you to control a 3D, high-definition Earth model using real-time hand gestures. The globe floats seamlessly over your hand through your webcam feed and responds intuitively to various gestures.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **AR Floating Globe:** The Earth intelligently tracks your primary open hand and floats smoothly above your palm.
+- **Grab and Spin:** Bring your second open hand into the frame and swipe horizontally to spin the globe on its axis. It features physics-based momentum, smoothly coming to a stop just like a real physical globe.
+- **Dynamic Zooming:** Hold up the "Peace Sign" ✌️ (index and middle finger raised) on *both* hands simultaneously. Moving your hands closer together or further apart dynamically zooms the globe in and out.
+- **Pause Rotation:** Close your primary hand into a fist ✊ to instantly freeze the globe's rotation.
+- **Premium Interface:** A stealthy, monochrome glassmorphic UI overlay provides real-time feedback on your active gestures.
+- **Silky Smooth Tracking:** Built-in Linear Interpolation (Lerp) algorithms ensure that all hand tracking and 3D rendering interactions feel incredibly smooth and jitter-free.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This project is built using modern, professional-grade technologies designed for high performance in the browser:
 
-## Expanding the ESLint configuration
+- **Frontend Framework:** [React](https://react.dev/) + [Vite](https://vitejs.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **3D Engine:** [Three.js](https://threejs.org/) powered by [@react-three/fiber](https://r3f.docs.pmnd.rs/) and [@react-three/drei](https://github.com/pmndrs/drei)
+- **Computer Vision:** Google's modern [@mediapipe/tasks-vision](https://developers.google.com/mediapipe/solutions/vision/hand_landmarker) running directly in the browser via WebAssembly/GPU (No backend server required!).
+- **State Management:** [Zustand](https://github.com/pmndrs/zustand) for ultra-fast, uncoupled state updates between the CV loop and the 3D render loop.
+- **Styling:** Pure, premium vanilla CSS.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 How to Run Locally
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. **Install Dependencies:**
+   Make sure you have Node.js installed, then run:
+   ```bash
+   npm install
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2. **Start the Development Server:**
+   ```bash
+   npm run dev
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3. **Launch the App:**
+   Open the provided local URL (typically `http://localhost:3000/` or `http://localhost:5173/`) in your web browser. 
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4. **Grant Camera Permissions:**
+   The application requires webcam access to track your hands. Grant permission when prompted by your browser, step back, and raise your hand to start interacting!
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📂 Project Structure
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `src/components/`: Contains the React UI and 3D Canvas components (`GlobeScene`, `Globe`, `CameraFeed`, `Overlay`).
+- `src/lib/`: Houses the core Computer Vision and State logic (`handTracking.ts`, `gestureDetection.ts`, `store.ts`).
+- `src/utils/`: Contains mathematical smoothing utilities like `lerp`.
+- `public/`: High-resolution NASA Earth textures (Diffuse, Specular, and Normal maps).
