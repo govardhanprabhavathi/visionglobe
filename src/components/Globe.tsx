@@ -1,28 +1,72 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { useGlobeStore } from '../lib/store';
 import { lerp } from '../utils/smoothing';
+import { celestialBodies, createRingTexture } from '../utils/celestialBodies';
 
 export const Globe: React.FC = () => {
   const meshRef = useRef<THREE.Group>(null);
-  const globeMeshRef = useRef<THREE.Mesh>(null);
+  const globeMeshRef = useRef<THREE.Group>(null);
   const { viewport } = useThree();
   const rotationVelocity = useRef({ x: 0, y: 0 });
 
-  const [colorMap, specularMap, normalMap] = useTexture([
+  const selectedBodyId = useGlobeStore((state) => state.selectedBodyId);
+
+  // Pre-loaded Earth local textures
+  const [earthColorMap, earthSpecularMap, earthNormalMap] = useTexture([
     '/earth_atmos.jpg',
     '/earth_specular.jpg',
     '/earth_normal.jpg'
   ]);
-  
-  // We don't subscribe to the store React-style to avoid re-renders.
-  // Instead, we read from the store's current state inside useFrame.
-  
-  // Create a nice material for the globe
-  // For a premium look, we'll use a standard material with a wireframe or custom texture
-  // A glowing effect would be nice, but we'll stick to a high-tech wireframe + solid core
+
+  // Pre-loaded high-fidelity planet and Sun textures from verified public CDN
+  const planetTextures = useTexture({
+    sun: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/sunmap.jpg',
+    mercury: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/mercurymap.jpg',
+    mercuryBump: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/mercurybump.jpg',
+    venus: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/venusmap.jpg',
+    venusBump: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/venusbump.jpg',
+    mars: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/marsmap1k.jpg',
+    marsBump: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/marsbump1k.jpg',
+    jupiter: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/jupitermap.jpg',
+    saturn: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/saturnmap.jpg',
+    uranus: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/uranusmap.jpg',
+    neptune: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/neptunemap.jpg'
+  });
+
+  const currentBody = useMemo(() => {
+    return celestialBodies.find((b) => b.id === selectedBodyId) || celestialBodies[3]; // Fallback to Earth
+  }, [selectedBodyId]);
+
+  // Active color map
+  const activeColorMap = useMemo(() => {
+    if (selectedBodyId === 'earth') {
+      return earthColorMap;
+    }
+    return planetTextures[selectedBodyId as keyof typeof planetTextures] || null;
+  }, [selectedBodyId, earthColorMap, planetTextures]);
+
+  // Procedural ring texture for Saturn/Uranus
+  const ringTexture = useMemo(() => {
+    if (selectedBodyId === 'saturn' || selectedBodyId === 'uranus') {
+      const canvas = createRingTexture(selectedBodyId);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+    return null;
+  }, [selectedBodyId]);
+
+  // Clean up procedural ring texture on unmount/change
+  useEffect(() => {
+    return () => {
+      if (ringTexture) {
+        ringTexture.dispose();
+      }
+    };
+  }, [ringTexture]);
   
   useFrame((_state, delta) => {
     if (!meshRef.current) return;
@@ -51,7 +95,6 @@ export const Globe: React.FC = () => {
     }
 
     // 2. Scale Interpolation (Zoom)
-    // Base scale is 1, modified by distance
     const targetScale = distance * 2; // base size
     meshRef.current.scale.x = lerp(meshRef.current.scale.x, targetScale, 0.1);
     meshRef.current.scale.y = lerp(meshRef.current.scale.y, targetScale, 0.1);
@@ -77,20 +120,71 @@ export const Globe: React.FC = () => {
 
   return (
     <group ref={meshRef}>
-      <mesh ref={globeMeshRef}>
-        <sphereGeometry args={[1, 64, 64]} />
-        <meshStandardMaterial 
-          map={colorMap}
-          normalMap={normalMap}
-          roughnessMap={specularMap}
-          metalness={0.1}
-          roughness={0.6}
-        />
-      </mesh>
-      {/* Subtle Atmosphere Glow */}
-      <mesh>
+      <group ref={globeMeshRef}>
+        {/* Sphere Core */}
+        <mesh key={`planet-${selectedBodyId}`}>
+          <sphereGeometry args={[1, 64, 64]} />
+          <meshStandardMaterial 
+            key={`mat-${selectedBodyId}`}
+            map={activeColorMap}
+            // Explicitly set maps to null when not on Earth to prevent R3F texture leakage
+            normalMap={selectedBodyId === 'earth' ? earthNormalMap : null}
+            roughnessMap={selectedBodyId === 'earth' ? earthSpecularMap : null}
+            // Apply bump maps for terrestrial bodies only (gas giants/Sun are smooth)
+            bumpMap={
+              selectedBodyId === 'mercury' ? planetTextures.mercuryBump :
+              selectedBodyId === 'venus' ? planetTextures.venusBump :
+              selectedBodyId === 'mars' ? planetTextures.marsBump :
+              null
+            }
+            bumpScale={0.012}
+            roughness={currentBody.roughness}
+            metalness={currentBody.metalness}
+            emissive={currentBody.emissive ? new THREE.Color(currentBody.color) : new THREE.Color('#000000')}
+            emissiveIntensity={currentBody.emissive ? 1.6 : 0}
+          />
+        </mesh>
+
+        {/* Saturn's Ring System */}
+        {selectedBodyId === 'saturn' && ringTexture && (
+          <mesh rotation={[Math.PI / 2.1, 0, 0]}>
+            <ringGeometry args={[1.3, 2.5, 64]} />
+            <meshStandardMaterial
+              map={ringTexture}
+              transparent
+              side={THREE.DoubleSide}
+              opacity={0.85}
+              roughness={0.6}
+              metalness={0.1}
+            />
+          </mesh>
+        )}
+
+        {/* Uranus's Tilted Ring System */}
+        {selectedBodyId === 'uranus' && ringTexture && (
+          <mesh rotation={[Math.PI / 10, Math.PI / 2, 0]}>
+            <ringGeometry args={[1.3, 1.6, 64]} />
+            <meshStandardMaterial
+              map={ringTexture}
+              transparent
+              side={THREE.DoubleSide}
+              opacity={0.6}
+              roughness={0.7}
+              metalness={0.1}
+            />
+          </mesh>
+        )}
+      </group>
+
+      {/* Dynamic atmosphere glow matched to selected planet/Sun */}
+      <mesh key={`glow-${selectedBodyId}`}>
         <sphereGeometry args={[1.05, 32, 32]} />
-        <meshBasicMaterial color="#FFFFFF" transparent opacity={0.15} side={THREE.BackSide} />
+        <meshBasicMaterial 
+          color={currentBody.color} 
+          transparent 
+          opacity={selectedBodyId === 'sun' ? 0.35 : 0.15} 
+          side={THREE.BackSide} 
+        />
       </mesh>
     </group>
   );
