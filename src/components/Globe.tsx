@@ -94,8 +94,9 @@ export const Globe: React.FC = () => {
       meshRef.current.position.z = lerp(meshRef.current.position.z, 0, 0.05);
     }
 
-    // 2. Scale Interpolation (Zoom)
-    const targetScale = distance * 2; // base size
+    // 2. Scale Interpolation (Zoom with responsive base scaling)
+    const baseScale = Math.max(0.95, Math.min(viewport.width * 0.22, 1.8));
+    const targetScale = distance * baseScale;
     meshRef.current.scale.x = lerp(meshRef.current.scale.x, targetScale, 0.1);
     meshRef.current.scale.y = lerp(meshRef.current.scale.y, targetScale, 0.1);
     meshRef.current.scale.z = lerp(meshRef.current.scale.z, targetScale, 0.1);
