@@ -1,6 +1,6 @@
-# SolarVision ☀️🪐
+# VisionGlobe 🌍✋
 
-SolarVision is an interactive, browser-based Augmented Reality (AR) application that allows you to control a 3D, high-definition Solar System model (including the Sun and all 8 planets) using real-time hand gestures. The model floats seamlessly over your hand through your webcam feed and responds intuitively to various gestures.
+VisionGlobe is an interactive, browser-based Augmented Reality (AR) application that allows you to control a 3D, high-definition Earth model using real-time hand gestures. The globe floats seamlessly over your hand through your webcam feed and responds intuitively to various gestures.
 
 ## ✨ Features
 
