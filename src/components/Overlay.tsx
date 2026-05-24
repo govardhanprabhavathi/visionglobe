@@ -22,7 +22,7 @@ export const Overlay: React.FC = () => {
       <header className="header">
         <div className="logo-group">
           <GlobeIcon size={24} className="logo-icon animate-pulse-slow" />
-          <h1>VisionGlobe</h1>
+          <h1>SolarVision</h1>
         </div>
         <div className={`status-badge ${trackingActive ? 'active' : 'inactive'}`}>
           <Activity size={16} />
