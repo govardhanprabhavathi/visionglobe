@@ -151,6 +151,21 @@ export const celestialBodies: CelestialBody[] = [
       dayLength: '16.1 Hours',
       distanceFromSun: '4.5B km'
     }
+  },
+  {
+    id: 'moon',
+    name: 'The Moon',
+    type: 'Natural Satellite',
+    description: 'Earth\'s only natural satellite. A rocky, cratered world locked in synchronous rotation, constantly showing the same face to Earth.',
+    color: '#b0bec5',
+    roughness: 0.9,
+    metalness: 0.05,
+    metrics: {
+      diameter: '3,474 km',
+      gravity: '1.62 m/s²',
+      dayLength: '29.5 Earth Days',
+      distanceFromSun: '149.6M km'
+    }
   }
 ];
 

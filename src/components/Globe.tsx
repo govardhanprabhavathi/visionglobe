@@ -33,7 +33,9 @@ export const Globe: React.FC = () => {
     jupiter: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/jupitermap.jpg',
     saturn: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/saturnmap.jpg',
     uranus: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/uranusmap.jpg',
-    neptune: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/neptunemap.jpg'
+    neptune: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/neptunemap.jpg',
+    moon: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/moonmap1k.jpg',
+    moonBump: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/moonbump1k.jpg'
   });
 
   const currentBody = useMemo(() => {
@@ -136,6 +138,7 @@ export const Globe: React.FC = () => {
               selectedBodyId === 'mercury' ? planetTextures.mercuryBump :
               selectedBodyId === 'venus' ? planetTextures.venusBump :
               selectedBodyId === 'mars' ? planetTextures.marsBump :
+              selectedBodyId === 'moon' ? planetTextures.moonBump :
               null
             }
             bumpScale={0.012}
